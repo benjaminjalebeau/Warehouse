@@ -12,6 +12,9 @@ builder.Services.AddDbContext<WarehouseDbContext>(options => options.UseSqlite(b
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// This makes all CRUD operations available in any of the pages. Write "@inject DataService DataService" at the top of the page or component to import CRUD functions.
+builder.Services.AddScoped<DataService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
