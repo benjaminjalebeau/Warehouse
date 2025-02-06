@@ -1,0 +1,102 @@
+@page "/inventory"
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+@rendermode InteractiveServer
+
+<h3>Inventory Crud Testing Page</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Weight</th>
+            <th>Descrtiption</th>
+            <th>Recieved Date</th>
+            <th>Location</th>
+            <th>Actions</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in inventory)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Weight</td>
+                <td>@item.Description</td>
+                <td>@item.ReceivedDate</td>
+                <td>@item.LocationId</td>
+                <td>@item.CustomerId</td>
+                <td>
+                    @*<button @onclick="() => EditInventory(item)">Edit</button>*@
+                    <button @onclick="() => DeleteInventory(item.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Add Inventory Item</h4>
+<input @bind="newItem.Name" placeholder="Item Name" />
+<input type="number" @bind="newItem.Weight" placeholder="Weight of Item in KG" />
+<input type="text" @bind="newItem.Description" placeholder="Description of Item">
+<input type="datetime" @bind="newItem.ReceivedDate">
+<input type="text" @bind="newItem.LocationId" placeholder="LocationId">
+<input type="number" @bind="newItem.CustomerId">
+<button @onclick="SaveInventory">Save</button>
+
+@code {
+    private List<InventoryItem> inventory = new();
+    private InventoryItem newItem = new  InventoryItem{
+        Name = "TestBox",
+        Weight = 1.55F,
+        CustomerId = 1,
+        ReceivedDate = DateTime.Today,
+        Description = "This is a test"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        inventory = await DataService.GetInventoryAsync();
+    }
+
+    private async Task SaveInventory()
+    {
+        if (newItem.Id == 0)
+            await DataService.AddInventoryItemAsync(newItem);
+        else
+            await DataService.UpdateInventoryItemAsync(newItem);
+
+        newItem = new  InventoryItem
+        {
+            Name = "TestBox",
+            Weight = 1.55F,
+            CustomerId = 1,
+            ReceivedDate = DateTime.Today,
+            Description = "This is a test"
+        };
+        inventory = await DataService.GetInventoryAsync();
+    }
+
+    private void EditInventory(InventoryItem item)
+    {
+        newItem = new InventoryItem 
+        { 
+            Id = item.Id, 
+            Name = item.Name, 
+            Description = item.Description, 
+            CustomerId = item.CustomerId,
+            ReceivedDate = item.ReceivedDate,
+            Weight = item.Weight,
+            LocationId = item.LocationId,
+            ShippedDate = item.ShippedDate
+        };
+    }
+
+    private async Task DeleteInventory(int id)
+    {
+        await DataService.DeleteInventoryItemAsync(id);
+        inventory = await DataService.GetInventoryAsync();
+    }
+}
