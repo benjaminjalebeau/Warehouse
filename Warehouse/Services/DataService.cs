@@ -14,7 +14,46 @@ public class DataService{
     // Enter any CRUD operations below, 
     // _context is the db you will be interacting with."
 
+    //Checks if an email is already being used by any worker or customer.
+    public async Task<bool> IsEmailTakenAsync(string email)
+    {
+        var checkWorkers = await _context.Workers.AnyAsync(w => w.Email == email);
+        var checkCustomers = await _context.Customers.AnyAsync(c => c.Email == email);
+
+        return checkWorkers || checkCustomers;
+    }
+
     /*********Worker CRUD**********/
+    // Returns all workers
+    public async Task<List<Worker>> GetWorkersAsync(int id)
+    {
+        return await _context.Workers.ToListAsync();
+    }
+
+    // Adds a new worker
+    public async Task AddWorkerAsync(Worker worker)
+    {
+        _context.Workers.Add(worker);
+        await _context.SaveChangesAsync();
+    }
+
+    // Updates a worker's info
+    public async Task UpdateWorkerAsync(Worker worker)
+    {
+        _context.Workers.Update(worker);
+        await _context.SaveChangesAsync();
+    }
+
+    //Removes a worker
+    public async Task DeleteWorkerAsync(int id)
+    {
+        var worker = await _context.Workers.FindAsync(id);
+        if (worker != null)
+        {
+            _context.Workers.Remove(worker);
+            await _context.SaveChangesAsync();
+        }
+    }
 
     /*********Inventory CRUD**********/
     //Returns all inventory items stored in DB
@@ -74,4 +113,38 @@ public class DataService{
     }
 
     /*********Customer CRUD**********/
+    //Gets customer by customer id
+    public async Task<Customer?> GetCustomerByIdAsync(int id)
+    {
+        return await _context.Customers.FindAsync(id);
+    }
+
+    //Gets all customers
+    public async Task<List<Customer>> GetCustomersAsync() => await _context.Customers.ToListAsync();
+
+    //Adds a new customer
+    public async Task AddCustomerAsync(Customer customer)
+    {
+        _context.Customers.Add(customer);
+        await _context.SaveChangesAsync();
+        
+    }
+
+    //Updates a customer's info
+    public async Task UpdateCustomerAsync(Customer customer)
+    {
+        _context.Customers.Update(customer);
+        await _context.SaveChangesAsync();
+    }
+
+    //Removes a customer from the db
+    public async Task RemoveCustomerAsync(int id)
+    {
+        var customer = await _context.Customers.FindAsync(id);
+        if (customer != null)
+        {
+            _context.Customers.Remove(customer);
+            await _context.SaveChangesAsync();
+        }
+    }
 }

@@ -1,14 +1,21 @@
+using System.ComponentModel.DataAnnotations;
 namespace Warehouse.Models;
 public class Customer
 {
     public int Id {get; set;}
 
-    public required string firstName {get; set;}
+    [Required(ErrorMessage = "Please enter your first name.")]
+    public required string FirstName {get; set;}
 
-    public required string lastName {get; set;}
+    [Required(ErrorMessage = "Please enter your last name.")]
+    public required string LastName {get; set;}
 
-    public required string email {get; set;}
+    [Required(ErrorMessage = "Please enter a valid Email.")]
+    [EmailAddress(ErrorMessage ="Invalid email format.")]
+    public required string Email {get; set;}
 
-    public required string password {get; set;}
+    [Required(ErrorMessage = "Please enter a password.")]
+    [StringLength(20, MinimumLength = 8, ErrorMessage = "Password must be 8 characters long.")]
+    public required string Password {get; set;}
     
 }
