@@ -3,6 +3,7 @@ using Warehouse.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Blazored.LocalStorage;
 using System.Text;
 
 
@@ -28,6 +29,9 @@ builder.Services.AddRazorComponents()
 // This makes all CRUD operations available in any of the pages. Write "@inject DataService DataService" at the top of the page or component to import CRUD functions.
 builder.Services.AddScoped<DataService>();
 
+// This makes authorization accessible to any page.
+builder.Services.AddScoped<AuthService>();
+
 // Sets up JWT token authentication for the app.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -42,6 +46,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddBlazoredLocalStorage();
+
 
 
 

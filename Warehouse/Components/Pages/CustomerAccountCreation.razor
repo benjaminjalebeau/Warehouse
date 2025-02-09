@@ -1,0 +1,89 @@
+@page "/CustomerAccountCreation"
+@using Warehouse.Data;
+@using Warehouse.Models;
+@using System.ComponentModel.DataAnnotations
+@inject DataService DataService
+@rendermode InteractiveServer
+
+<PageTitle>Customer Account Creation</PageTitle>
+<div id="AddCustomerPage">
+<h3>Customer Account Creation</h3>
+
+<p>Please fill out the form to create a customer account.</p>
+
+<EditForm Model="@newCustomer" OnValidSubmit="@(SaveCustomer)" FormName="CreateCustomerAccountForm">
+    <DataAnnotationsValidator/>
+    @if(!string.IsNullOrEmpty(message))
+    {
+        <div class="alert">@message</div>
+    }
+
+    <div>
+        <label>First Name:</label>
+        <InputText @bind-Value="newCustomer.FirstName" placeholder="ex: John"/>
+        <ValidationMessage For="@(() => newCustomer.FirstName)" />
+    </div>
+    <div>
+        <label>Full Name:</label>
+        <InputText @bind-Value="newCustomer.LastName" placeholder="ex: Doe"/>
+        <ValidationMessage For="@(() => newCustomer.LastName)" />
+    </div>
+    <div>
+        <label>Email:</label>
+        <InputText @bind-Value="newCustomer.Email" type="email" placeholder="ex: test@example.com"/>
+        <ValidationMessage For="@(() => newCustomer.Email)" />
+    </div>
+    
+    <div>
+        <label>Password</label>
+        <InputText @bind-Value="newCustomer.Password" type="password" placeholder="ex: password"/>
+        <ValidationMessage For="@(() => newCustomer.Password)" />
+    </div>
+
+    <button type="submit">Submit</button>
+    
+</EditForm>
+</div>
+
+
+@code 
+{
+    private string? message;
+    private Customer newCustomer = new Customer{
+        FirstName = string.Empty,
+        LastName = string.Empty,
+        Email = string.Empty,
+        Password = string.Empty
+    };
+
+    private async Task SaveCustomer()
+    {
+        var checkEmail = await DataService.IsEmailTakenAsync(newCustomer.Email);
+
+        if(checkEmail)
+        {
+            message = "Email is already in use.";
+        }
+        else 
+        {
+            if (newCustomer.Id == 0)
+            {
+                await DataService.AddCustomerAsync(newCustomer);
+                message = "Account successfully created.";
+                newCustomer = new Customer {
+                    FirstName = string.Empty,
+                    LastName = string.Empty,
+                    Email = string.Empty,
+                    Password = string.Empty
+                };
+                StateHasChanged();
+            }
+            else
+            {
+                message = "Something went wrong.";
+            }
+        }  
+    }
+
+    
+}

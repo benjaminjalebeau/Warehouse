@@ -1,0 +1,40 @@
+@page "/login"
+@inject AuthService AuthService
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+
+<h3>Login</h3>
+<input @bind="email" placeholder="Enter Email">
+<input @bind="password" type="password" placeholder="Enter Password">
+<button @onclick="LoginUser">Login</button>
+@if(!string.IsNullOrEmpty(Message))
+{
+    <div class="alert">@Message</div>
+}
+
+@code
+{
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private string Message = string.Empty;
+
+    private async Task LoginUser()
+    {
+        var token = AuthService.AuthenticateUserAsync(email, password);
+        if (token != null)
+        {
+            await LocalStorage.SetItemAsync("authToken", token);
+            Message = "Success, redirecting to Home";
+            StateHasChanged();
+            await Task.Delay(2000);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Message = "Invalid Credentials";
+            StateHasChanged();
+        }
+    }
+} 

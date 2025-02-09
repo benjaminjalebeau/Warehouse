@@ -7,6 +7,7 @@ using Warehouse.Data;
 using Warehouse.Models;
 
 
+
 public class AuthService
 {
     private readonly WarehouseDbContext _context;
@@ -21,14 +22,14 @@ public class AuthService
 
     public async Task<string?> AuthenticateUserAsync(string email, string password)
     {
-        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.email == email);
-        if (customer != null && VerifyPassword(password, customer.password))
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+        if (customer != null && VerifyPassword(password, customer.Password))
         {
             return GenerateJwtToken(email, "Customer");
         }
 
-        var worker = await _context.Workers.FirstOrDefaultAsync(w => w.email == email);
-        if (worker != null && VerifyPassword(password, worker.password))
+        var worker = await _context.Workers.FirstOrDefaultAsync(w => w.Email == email);
+        if (worker != null && VerifyPassword(password, worker.Password))
         {
             return GenerateJwtToken(email, "Worker");
         }
@@ -62,6 +63,8 @@ public class AuthService
         // Hashing not implemented yet, update this once done. 
         return inputPassword == storedHash;
     }
+
+
 
 
 }
