@@ -1,0 +1,57 @@
+@* @page "/customers"
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+@rendermode InteractiveServer
+
+<h3>Customers</h3>
+
+<button @onclick="CreateCustomer">Create New Customer</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in customers)
+        {
+            <tr>
+                <td>@customer.Name</td>
+                <td>@customer.Email</td>
+                <td>
+                    <button @onclick="() => EditCustomer(customer.Id)">Edit</button>
+                    <button @onclick="() => DeleteCustomer(customer.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Customer> customers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        customers = await CustomerService.GetCustomersAsync();
+    }
+
+    private async Task CreateCustomer()
+    {
+        // Logic to create a new customer
+    }
+
+    private async Task EditCustomer(int customerId)
+    {
+        // Logic to edit an existing customer
+    }
+
+    private async Task DeleteCustomer(int customerId)
+    {
+        await CustomerService.DeleteCustomerAsync(customerId);
+        customers = await CustomerService.GetCustomersAsync();
+    }
+} *@
