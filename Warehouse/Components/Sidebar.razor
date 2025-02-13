@@ -1,34 +1,46 @@
 @using Warehouse.Components
 
-<header>
-
+<div>
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
         <div class="position-sticky">
             <div class="list-group list-group-flush mx-3 mt-4">
+                @* sidebar / *@
 
-                <NavLink href="#" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
-                    <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Warehouse dashboard</span>
+                <NavLink href="/dashboard" class="dashboard-title list-group-item list-group-item-action py-2 ripple"
+                    ActiveClass="active" Match="NavLinkMatch.All">
+                    <i class="fas fa-chart-area fa-fw me-3"></i><span>Dashboard</span>
                 </NavLink>
-                <NavLink href="#" class="list-group-item list-group-item-action py-2 ripple active">
-                    <i class="fas fa-chart-area fa-fw me-3"></i><span>Link1</span>
-                </NavLink>
-                <NavLink href="#" class="list-group-item list-group-item-action py-2 ripple"><i
-                        class="fas fa-lock fa-fw me-3"></i><span>Link1</span></NavLink>
-                <NavLink href="#" class="list-group-item list-group-item-action py-2 ripple"><i
-                        class="fas fa-chart-line fa-fw me-3"></i><span>Link1</span></NavLink>
-                <NavLink href="#" class="list-group-item list-group-item-action py-2 ripple">
-                    <i class="fas fa-chart-pie fa-fw me-3"></i><span>Link1</span>
-                </NavLink>
-                <NavLink href="#" class="list-group-item list-group-item-action py-2 ripple"><i
-                        class="fas fa-chart-bar fa-fw me-3"></i><span>Settings</span></NavLink>
-                <NavLink href="#" class="list-group-item list-group-item-action py-2 ripple"><i
-                        class="fas fa-chart-bar fa-fw me-3"></i><span>Sing Out</span></NavLink>
 
+                <NavLink href="/dashboard/customers" class="list-group-item list-group-item-action py-2 ripple"
+                    ActiveClass="active">
+                    <i class="fas fa-chart-area fa-fw me-3"></i><span>Customers</span>
+                </NavLink>
+
+                <NavLink href="/dashboard/inventory" class="list-group-item list-group-item-action py-2 ripple"
+                    ActiveClass="active">
+                    <i class="fas fa-lock fa-fw me-3"></i><span>Inventory</span>
+                </NavLink>
+
+                <NavLink href="/dashboard/workers" class="list-group-item list-group-item-action py-2 ripple"
+                    ActiveClass="active">
+                    <i class="fas fa-lock fa-fw me-3"></i><span>Workers</span>
+                </NavLink>
+
+                <NavLink href="/account" class="list-group-item list-group-item-action py-2 ripple"
+                    ActiveClass="active">
+                    <i class="fas fa-chart-bar fa-fw me-3"></i><span>Account Setting</span>
+                </NavLink>
+
+                <NavLink href="/account/signout" class="list-group-item list-group-item-action py-2 ripple"
+                    ActiveClass="active">
+                    <i class="fas fa-chart-bar fa-fw me-3"></i><span>Sign Out</span>
+                </NavLink>
             </div>
         </div>
     </nav>
-</header>
+</div>
 
-<main style="margin-top: 58px;">
+
+@* <main style="margin-top: 58px;">
     <div class="container pt-4"></div>
-</main>
+</main> *@

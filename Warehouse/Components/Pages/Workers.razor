@@ -1,0 +1,270 @@
+@page "/dashboard/workers"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
+@using Warehouse.Components
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+@rendermode RenderMode.InteractiveServer
+
+<PageTitle>Workers</PageTitle>
+
+<h1>Workers</h1>
+
+@if (PagedWorkers.Count == 0)
+{
+    <p><em>There are no workers available yet to show.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th aria-label="Name">Name</th>
+                <th aria-label="Email">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var worker in PagedWorkers)
+            {
+                <tr>
+                    <td>@worker.Id</td>
+                    <td>@worker.Name</td>
+                    <td>@worker.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <button @onclick="PreviousPage" disabled="@(!CanGoPrevious)">⏪ Previous</button>
+        <span> Page @CurrentPage of @TotalPages </span>
+        <button @onclick="NextPage" disabled="@(!CanGoNext)">Next ⏩</button>
+    </div>
+}
+
+@code {
+    private List<Worker> workers = new();
+    private List<Worker> PagedWorkers = new();
+    private int CurrentPage { get; set; } = 1;
+    private int TotalPages { get; set; }
+    private const int PageSize = 10; // Número de trabajadores por página
+
+    // Propiedades que determinan si se puede ir a la siguiente o anterior página
+    private bool CanGoNext => CurrentPage < TotalPages;
+    private bool CanGoPrevious => CurrentPage > 1;
+
+    // Método que se llama al inicializar el componente
+    protected override async Task OnInitializedAsync()
+    {
+        workers = await DataService.GetWorkersAsync() ?? new List<Worker>();
+        TotalPages = (int)Math.Ceiling((double)workers.Count / PageSize);
+        LoadPage(CurrentPage);
+    }
+
+    // Método para cargar la página actual
+    private void LoadPage(int pageNumber)
+    {
+        PagedWorkers = workers.Skip((pageNumber - 1) * PageSize).Take(PageSize).ToList();
+        StateHasChanged(); // Fuerza la actualización de la UI
+    }
+
+    // Método para pasar a la siguiente página
+    private void NextPage()
+    {
+        if (CanGoNext)
+        {
+            CurrentPage++;
+            LoadPage(CurrentPage);
+        }
+    }
+
+    // Método para pasar a la página anterior
+    private void PreviousPage()
+    {
+        if (CanGoPrevious)
+        {
+            CurrentPage--;
+            LoadPage(CurrentPage);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @page "/dashboard/workers"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
+@using Warehouse.Components
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+@rendermode RenderMode.InteractiveServer
+
+<PageTitle>Workers</PageTitle>
+
+<h1>Workers</h1>
+
+@if (PagedWorkers.Count == 0)
+{
+    <p><em>There are no workers available yet to show.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th aria-label="Name">Name</th>
+                <th aria-label="Email">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var worker in PagedWorkers)
+            {
+                <tr>
+                    <td>@worker.Id</td>
+                    <td>@worker.Name</td>
+                    <td>@worker.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <button @onclick="PreviousPage" disabled="@(!CanGoPrevious)">⏪ Previous</button>
+        <span> Page @CurrentPage of @TotalPages </span>
+        <button @onclick="NextPage" disabled="@(!CanGoNext)">Next ⏩</button>
+    </div>
+}
+
+@code {
+    private List<Worker> workers = new();
+    private List<Worker> PagedWorkers = new();
+    private int CurrentPage = 1;
+    private int PageSize = 3;
+    private int TotalPages => (int)Math.Ceiling((double)workers.Count / PageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        workers = await DataService.GetWorkersAsync() ?? new List<Worker>();
+        UpdatePagedWorkers();
+    }
+
+    private void UpdatePagedWorkers()
+    {
+        var skip = (CurrentPage - 1) * PageSize;
+        PagedWorkers = workers.Skip(skip).Take(PageSize).ToList();
+    }
+
+    private bool CanGoPrevious => CurrentPage > 1;
+    private bool CanGoNext => CurrentPage < TotalPages;
+
+    private async Task PreviousPage()
+    {
+        if (CanGoPrevious)
+        {
+            CurrentPage--;
+            UpdatePagedWorkers();
+            StateHasChanged(); // Forzar actualización de la UI
+        }
+    }
+
+    private async Task NextPage()
+    {
+        if (CanGoNext)
+        {
+            CurrentPage++;
+            UpdatePagedWorkers();
+            StateHasChanged(); // Forzar actualización de la UI
+        }
+    }
+
+}
+ *@
+
+
+
+
+
+
+@* @page "/dashboard/workers"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
+@using Warehouse.Components
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+
+<PageTitle>Workers</PageTitle>
+
+<h1>Workers</h1>
+
+@if (PagedWorkers.Count == 0)
+{
+    <p><em>There are no workers available yet to show.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th aria-label="Name">Name</th>
+                <th aria-label="Email">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var worker in PagedWorkers)
+            {
+                <tr>
+                    <td>@worker.Id</td>
+                    <td>@worker.Name</td>
+                    <td>@worker.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <Pagination CurrentPage="@CurrentPage" TotalPages="@TotalPages" OnPageChanged="HandlePageChanged" />
+}
+
+@code {
+    private List<Worker> workers = new();
+    private List<Worker> PagedWorkers = new();
+    private int CurrentPage = 1;
+    private int PageSize = 2;
+    private int TotalPages => (int)Math.Ceiling((double)workers.Count / PageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        workers = await DataService.GetWorkersAsync() ?? new List<Worker>();
+        UpdatePagedWorkers();
+    }
+
+    private void UpdatePagedWorkers()
+    {
+        var skip = (CurrentPage - 1) * PageSize;
+        PagedWorkers = workers.Skip(skip).Take(PageSize).ToList();
+    }
+
+    private void HandlePageChanged(int newPage)
+    {
+        CurrentPage = newPage;
+        UpdatePagedWorkers();
+        StateHasChanged();
+    }
+} *@

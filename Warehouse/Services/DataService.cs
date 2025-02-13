@@ -25,7 +25,16 @@ public class DataService{
 
     /*********Worker CRUD**********/
     // Returns all workers
-    public async Task<List<Worker>> GetWorkersAsync(int id)
+
+    // original function
+    // I created another one because this one requests an id that is not used in the function
+
+    // public async Task<List<Worker>> GetWorkersAsync(int id)
+    // {
+    //     return await _context.Workers.ToListAsync();
+    // }
+
+    public async Task<List<Worker>> GetWorkersAsync()
     {
         return await _context.Workers.ToListAsync();
     }

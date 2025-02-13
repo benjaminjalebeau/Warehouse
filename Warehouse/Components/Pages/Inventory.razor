@@ -1,10 +1,17 @@
-@page "/inventory"
+@page "/dashboard/inventory"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
 @using Warehouse.Data;
 @using Warehouse.Models;
 @inject DataService DataService
 @rendermode InteractiveServer
 
-<h3>Inventory Crud Testing Page</h3>
+
+
+
+<h3>Inventory </h3>
+@* Link for the create component *@
+<NavLink href="/dashboard/inventory/create"><span class="btn btn-success my-4">Create New Item</span></NavLink>
 
 <table class="table">
     <thead>
@@ -37,14 +44,14 @@
     </tbody>
 </table>
 
-<h4>Add Inventory Item</h4>
+@* <h4>Add Inventory Item</h4>
 <input @bind="newItem.Name" placeholder="Item Name" />
 <input type="number" @bind="newItem.Weight" placeholder="Weight of Item in KG" />
 <input type="text" @bind="newItem.Description" placeholder="Description of Item">
 <input type="datetime" @bind="newItem.ReceivedDate">
 <input type="text" @bind="newItem.LocationId" placeholder="LocationId">
 <input type="number" @bind="newItem.CustomerId">
-<button @onclick="SaveInventory">Save</button>
+<button @onclick="SaveInventory">Save</button> *@
 
 @code {
     private List<InventoryItem> inventory = new();
