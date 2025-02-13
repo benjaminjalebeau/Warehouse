@@ -1,4 +1,4 @@
-@page "/dashboard/inventory/edit"
+@page "/dashboard/inventory/edit/{id:int}"
 @using Warehouse.Components.Layout
 @layout DashboardLayout
 @using Microsoft.EntityFrameworkCore
@@ -13,84 +13,90 @@
 
 <h1>Edit an inventory Item</h1>
 
-<h2>@Item.Name</h2>
+@if (inventoryItem != null)
+{
+    <h2>@inventoryItem.Name</h2>
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Item" OnValidSubmit="SaveInventory">
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
-            <div class="mb-3">
-                <label for="name" class="form-label">Name:</label>
-                <InputText id="name" @bind-Value="Item.Name" class="form-control" />
-                <ValidationMessage For="() => Item.Name" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="weight" class="form-label">weight:</label>
-                <InputNumber id="weight" @bind-Value="Item.Weight" class="form-control"
-                    placeholder="Weight of Item in KG" />
-                <ValidationMessage For="() => Item.Weight" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description:</label>
-                <InputText id="description" @bind-Value="Item.Description" class="form-control"
-                    placeholder="Description of Item" />
-                <ValidationMessage For="() => Item.Description" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="receiveDate" class="form-label">Receive Date:</label>
-                <InputDate id="receiveDate" @bind-Value="Item.ReceivedDate" class="form-control" />
-                <ValidationMessage For="() => Item.ReceivedDate" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="location" class="form-label">Location:</label>
-                <InputText id="location" class="form-control" @bind-Value="Item.LocationId" />
-                <ValidationMessage For="() => Item.LocationId" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="customerid" class="form-label">Customer Id:</label>
-                <InputNumber id="customerid" @bind-Value="Item.CustomerId" class="form-control"
-                    placeholder="Example: 3" />
-                <ValidationMessage For="() => Item.CustomerId" class="text-danger" />
-            </div>
-            <button type="submit" class="btn btn-primary">Create</button>
-        </EditForm>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="inventoryItem" OnValidSubmit="UpdateInventory">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" role="alert" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="inventoryItem.Name" class="form-control" />
+                    <ValidationMessage For="() => inventoryItem.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="weight" class="form-label">weight:</label>
+                    <InputNumber id="weight" @bind-Value="inventoryItem.Weight" class="form-control"
+                        placeholder="Weight of inventoryItem in KG" />
+                    <ValidationMessage For="() => inventoryItem.Weight" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="inventoryItem.Description" class="form-control"
+                        placeholder="Description of inventoryItem" />
+                    <ValidationMessage For="() => inventoryItem.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="receiveDate" class="form-label">Receive Date:</label>
+                    <InputDate id="receiveDate" @bind-Value="inventoryItem.ReceivedDate" class="form-control" />
+                    <ValidationMessage For="() => inventoryItem.ReceivedDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location:</label>
+                    <InputText id="location" class="form-control" @bind-Value="inventoryItem.LocationId" />
+                    <ValidationMessage For="() => inventoryItem.LocationId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="customerid" class="form-label">Customer Id:</label>
+                    <InputNumber id="customerid" @bind-Value="inventoryItem.CustomerId" class="form-control"
+                        placeholder="Example: 3" />
+                    <ValidationMessage For="() => inventoryItem.CustomerId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Edit</button>
+            </EditForm>
+        </div>
     </div>
-</div>
 
-<div>
-    <NavLink href="/dashboard/inventory"><span class="my-3 btn btn-outline-info">Back to Inventory</span></NavLink>
-</div>
+    <div>
+        <NavLink href="/dashboard/inventory"><span class="my-3 btn btn-outline-info">Back to Inventory</span></NavLink>
+    </div>
 
+}
+else
+{
+
+    <p>Loading...</p>
+}
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
+    private InventoryItem? inventoryItem;
 
-    private InventoryItem Item = new InventoryItem
+    protected override async Task OnInitializedAsync()
     {
-        Name = string.Empty,
-        Weight = 0.1,
-        CustomerId = 1,
-        ReceivedDate = DateTime.Today,
-        Description = "This is a description"
-    };
+        inventoryItem = await DataService.GetInventoryItemByIdAsync(Id);
+    }
 
 
-    private async Task SaveInventory()
+    private async Task UpdateInventory()
     {
         try
         {
-            await DataService.AddInventoryItemAsync(Item);
-            // force the UI to refresh
-            StateHasChanged();
-
-            // Redirect the user to dashboard/inventory route one the item is created
-            NavigationManager.NavigateTo("/dashboard/inventory");
+            if (inventoryItem is not null)
+            {
+                await DataService.UpdateInventoryItemAsync(inventoryItem);
+                NavigationManager.NavigateTo("/dashboard/inventory");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error saving inventory: {ex.Message}");
-            
+            Console.WriteLine($"Error uptading inventory: {ex.Message}");
+
         }
     }
 

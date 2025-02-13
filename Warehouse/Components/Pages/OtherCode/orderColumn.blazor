@@ -1,0 +1,20 @@
+@code {
+        //vars to ordenate the table
+    private string sortColumn = "Name";
+    private bool ascending = true;
+
+    private void SortTable(string column) {
+        if (sortColumn == column) { // check if it is the same column
+            ascending = !ascending;
+        } else {
+            sortColumn = column;
+            ascending = true; // if this is a new column, then it will be ordered in ascending order
+        }
+
+        if (ascending) {
+            inventory = inventory.OrderBy(column).ToList();
+        } else {
+            inventory = inventory.OrderByDescending(column).ToList();
+        }
+    }
+}

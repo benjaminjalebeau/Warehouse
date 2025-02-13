@@ -4,6 +4,7 @@
 @using Warehouse.Data;
 @using Warehouse.Models;
 @inject DataService DataService
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 
@@ -17,12 +18,12 @@
     <thead>
         <tr>
             <th>Item Name</th>
-            <th>Weight</th>
-            <th>Descrtiption</th>
+            <th>Weight(Kg)</th>
+            @* <th>Description</th> *@
             <th>Recieved Date</th>
             <th>Location</th>
             <th>Actions</th>
-            <th></th>
+            <th>Customer (ID)</th>
         </tr>
     </thead>
     <tbody>
@@ -31,29 +32,25 @@
             <tr>
                 <td>@item.Name</td>
                 <td>@item.Weight</td>
-                <td>@item.Description</td>
+                @* <td>@item.Description</td> *@
                 <td>@item.ReceivedDate</td>
                 <td>@item.LocationId</td>
                 <td>@item.CustomerId</td>
                 <td>
-                    @*<button @onclick="() => EditInventory(item)">Edit</button>*@
-                    <button @onclick="() => DeleteInventory(item.Id)">Delete</button>
+                    <NavLink class="btn btn-secondary" href="@($"/dashboard/inventory/edit/{item.Id}")">Edit</NavLink>
+                    <NavLink class="btn btn-danger" href="@($"/dashboard/inventory/delete/{item.Id}")">Delete</NavLink>
                 </td>
             </tr>
         }
     </tbody>
+
 </table>
 
-@* <h4>Add Inventory Item</h4>
-<input @bind="newItem.Name" placeholder="Item Name" />
-<input type="number" @bind="newItem.Weight" placeholder="Weight of Item in KG" />
-<input type="text" @bind="newItem.Description" placeholder="Description of Item">
-<input type="datetime" @bind="newItem.ReceivedDate">
-<input type="text" @bind="newItem.LocationId" placeholder="LocationId">
-<input type="number" @bind="newItem.CustomerId">
-<button @onclick="SaveInventory">Save</button> *@
 
 @code {
+
+
+
     private List<InventoryItem> inventory = new();
     private InventoryItem newItem = new  InventoryItem{
         Name = "TestBox",
