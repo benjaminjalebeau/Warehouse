@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Blazored.LocalStorage;
 using System.Text;
+using Microsoft.AspNetCore.Components.Authorization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,13 +42,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+            RoleClaimType = "role"
         };
     });
 
-builder.Services.AddAuthorization();
-
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<CustomAuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RoleBasedPolicy", policy =>
+        policy.RequireRole("Worker", "Customer"));
+});
+
+
+
 
 
 

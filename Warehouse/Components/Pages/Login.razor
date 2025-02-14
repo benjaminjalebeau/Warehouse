@@ -1,6 +1,8 @@
 @page "/login"
+@using System.Text.Json;
 @inject AuthService AuthService
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject CustomAuthStateProvider CustomAuthStateProvider
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
@@ -8,7 +10,7 @@
 <h3>Login</h3>
 <input @bind="email" placeholder="Enter Email">
 <input @bind="password" type="password" placeholder="Enter Password">
-<button @onclick="LoginUser">Login</button>
+<button @onclick="HandleLogin">Login</button>
 @if(!string.IsNullOrEmpty(Message))
 {
     <div class="alert">@Message</div>
@@ -20,21 +22,20 @@
     private string password = string.Empty;
     private string Message = string.Empty;
 
-    private async Task LoginUser()
+    private async Task HandleLogin()
     {
-        var token = AuthService.AuthenticateUserAsync(email, password);
-        if (token != null)
+        
+        var response = await AuthService.AuthenticateUserAsync(email, password);
+        
+        if (response != null)
         {
-            await LocalStorage.SetItemAsync("authToken", token);
-            Message = "Success, redirecting to Home";
-            StateHasChanged();
-            await Task.Delay(2000);
+            //var token = JsonSerializer.Deserialize<Dictionary<string, string>>(response)["Result"]; // Extract token
+            await CustomAuthStateProvider.MarkUserAsAuthenticated(response);
             Navigation.NavigateTo("/");
         }
         else
         {
-            Message = "Invalid Credentials";
-            StateHasChanged();
+            Message = "Invalid email or password.";
         }
     }
 } 

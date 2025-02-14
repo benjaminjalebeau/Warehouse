@@ -47,7 +47,7 @@ public class AuthService
         {
             Subject = new ClaimsIdentity(new[] {
                 new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Role, role)
+                new Claim("role", role)
             }),
             Expires = DateTime.UtcNow.AddHours(2),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
