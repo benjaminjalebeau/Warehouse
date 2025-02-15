@@ -6,19 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using Blazored.LocalStorage;
 using System.Text;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-//Pulls secret from the appsettings.json file.
-var jwtSecret = builder.Configuration["JwtSettings:Secret"];
-
-
-//Checks to make sure JWT token secret was imported correctly, or if it exists. 
-if (string.IsNullOrEmpty(jwtSecret))
-{
-    throw new InvalidOperationException("Could not retrieve JWT secret.");
-}
 
 // Configures SQLite for the project.
 builder.Services.AddDbContext<WarehouseDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("WarehouseDbContext")));
@@ -33,38 +24,25 @@ builder.Services.AddScoped<DataService>();
 // This makes authorization accessible to any page.
 builder.Services.AddScoped<AuthService>();
 
-// Sets up JWT token authentication for the app.
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            RoleClaimType = "role"
-        };
+        options.LoginPath = "/Login";
     });
-
-builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddScoped<CustomAuthStateProvider>();
+builder.Services.AddAuthorization();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RoleBasedPolicy", policy =>
-        policy.RequireRole("Worker", "Customer"));
-});
-
-
-
-
-
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddHttpContextAccessor();
 
 
 var app = builder.Build();
 
+// Apply any pending migrations to the database (for development)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<WarehouseDbContext>();
+    db.Database.Migrate();
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -73,20 +51,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// Apply any pending migrations to the database (for development)
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<WarehouseDbContext>();
-    db.Database.Migrate();
-}
-
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
 app.Run();

@@ -5,41 +5,61 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Warehouse.Data;
 using Warehouse.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 
 
 public class AuthService
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly WarehouseDbContext _context;
 
     //The key will need to be stored in an enviroment variable later for security.
     private readonly string _jwtSecret = "WnsfTEfOwUB1Hjn3y5YN+5+Bv1IVi+2z2zSL+5b++8s=";
 
-    public AuthService(WarehouseDbContext context)
+    public AuthService(IHttpContextAccessor httpContextAccessor, WarehouseDbContext context)
     {
+        _httpContextAccessor = httpContextAccessor;
         _context = context;
     }
 
-    public async Task<string?> AuthenticateUserAsync(string email, string password)
+    public async Task<bool> AuthenticateUserAsync(string email, string password)
     {
         var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
         if (customer != null && VerifyPassword(password, customer.Password))
         {
-            return GenerateJwtToken(email, "Customer");
+            await GenerateCookie(email, "Customer");
+            return true;
         }
 
         var worker = await _context.Workers.FirstOrDefaultAsync(w => w.Email == email);
         if (worker != null && VerifyPassword(password, worker.Password))
         {
-            return GenerateJwtToken(email, "Worker");
+            await GenerateCookie(email, "Worker");
+            return true;
         }
 
-        return null;
+        return false;
+    }
 
+    private async Task GenerateCookie(string email, string role)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Email, email),
+            new(ClaimTypes.Name, email),
+            new(ClaimTypes.Role, role)
+        };
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties { IsPersistent = true };
+
+        var httpContext = _httpContextAccessor.HttpContext!;
+        await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
     }
 
     private string GenerateJwtToken(string email, string role)
-    {   
+    {
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_jwtSecret);

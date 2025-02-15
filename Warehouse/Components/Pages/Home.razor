@@ -3,11 +3,25 @@
 
 <PageTitle>Home</PageTitle>
 <div class="main-container">
+    <AuthorizeView>
+        <Authorized>
+            <p>Hello, @context.User.Identity?.Name!</p>
+        </Authorized>
+        <NotAuthorized>
+            <p>You're not authorized.</p>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Worker">
+        <Authorized>
+            <p>WORKER</p>
+        </Authorized>
+    </AuthorizeView>
 
     <div class="heading-container">
         <h1>Welcome to Warehouse Management App (WMA)</h1>
     </div>
-    
+
 
     <section>
         <h2>Manage Your Inventory Efficiently</h2>
@@ -20,7 +34,7 @@
 
     </section>
     <section class="sec-two">
-       
+
         <p>If you don’t have an account yet, <a href="">Sign Up</a> now and start optimizing your warehouse management.
             If you’re
             already a
@@ -72,12 +86,12 @@
         </div>
     </section>
 
-<section class="call-btns">
+    <section class="call-btns">
         <div>
             <button class="btn btn-primary"> Sign Up</button>
             <button class="btn btn-secondary"> log In</button>
         </div>
-</section>
+    </section>
 
 
 </div>

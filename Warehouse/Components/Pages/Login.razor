@@ -1,41 +1,35 @@
 @page "/login"
-@using System.Text.Json;
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using System.Security.Claims
 @inject AuthService AuthService
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-@inject CustomAuthStateProvider CustomAuthStateProvider
-@inject NavigationManager Navigation
-@rendermode InteractiveServer
-
+@inject NavigationManager NavManager
 
 <h3>Login</h3>
-<input @bind="email" placeholder="Enter Email">
-<input @bind="password" type="password" placeholder="Enter Password">
-<button @onclick="HandleLogin">Login</button>
-@if(!string.IsNullOrEmpty(Message))
-{
-    <div class="alert">@Message</div>
-}
+<EditForm method="post" FormName="ClickLogin" OnSubmit="HandleLogin" Model="UserCredentials">
+
+    <InputText @bind-Value="UserCredentials.Username" placeholder="Username"></InputText>
+    <InputText @bind-Value="UserCredentials.Password" placeholder="Password" />
+
+    <button type="submit"> SignIn</button>
+
+</EditForm>
 
 @code
 {
-    private string email = string.Empty;
-    private string password = string.Empty;
-    private string Message = string.Empty;
+    [SupplyParameterFromForm]
+    public Credential UserCredentials { get; set; } = new Credential();
+    public class Credential
+    {
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+    }
 
     private async Task HandleLogin()
     {
-        
-        var response = await AuthService.AuthenticateUserAsync(email, password);
-        
-        if (response != null)
-        {
-            //var token = JsonSerializer.Deserialize<Dictionary<string, string>>(response)["Result"]; // Extract token
-            await CustomAuthStateProvider.MarkUserAsAuthenticated(response);
-            Navigation.NavigateTo("/");
-        }
-        else
-        {
-            Message = "Invalid email or password.";
-        }
+        await AuthService.AuthenticateUserAsync(UserCredentials.Username, UserCredentials.Password);
+
+        NavManager.NavigateTo("/");
+
     }
-} 
+}
