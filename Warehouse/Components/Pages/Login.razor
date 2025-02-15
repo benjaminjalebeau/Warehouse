@@ -1,40 +1,35 @@
 @page "/login"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using System.Security.Claims
 @inject AuthService AuthService
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-@inject NavigationManager Navigation
-@rendermode InteractiveServer
-
+@inject NavigationManager NavManager
 
 <h3>Login</h3>
-<input @bind="email" placeholder="Enter Email">
-<input @bind="password" type="password" placeholder="Enter Password">
-<button @onclick="LoginUser">Login</button>
-@if(!string.IsNullOrEmpty(Message))
-{
-    <div class="alert">@Message</div>
-}
+<EditForm method="post" FormName="ClickLogin" OnSubmit="HandleLogin" Model="UserCredentials">
+
+    <InputText @bind-Value="UserCredentials.Username" placeholder="Username"></InputText>
+    <InputText @bind-Value="UserCredentials.Password" placeholder="Password" />
+
+    <button type="submit"> SignIn</button>
+
+</EditForm>
 
 @code
 {
-    private string email = string.Empty;
-    private string password = string.Empty;
-    private string Message = string.Empty;
-
-    private async Task LoginUser()
+    [SupplyParameterFromForm]
+    public Credential UserCredentials { get; set; } = new Credential();
+    public class Credential
     {
-        var token = AuthService.AuthenticateUserAsync(email, password);
-        if (token != null)
-        {
-            await LocalStorage.SetItemAsync("authToken", token);
-            Message = "Success, redirecting to Home";
-            StateHasChanged();
-            await Task.Delay(2000);
-            Navigation.NavigateTo("/");
-        }
-        else
-        {
-            Message = "Invalid Credentials";
-            StateHasChanged();
-        }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
     }
-} 
+
+    private async Task HandleLogin()
+    {
+        await AuthService.AuthenticateUserAsync(UserCredentials.Username, UserCredentials.Password);
+
+        NavManager.NavigateTo("/");
+
+    }
+}
