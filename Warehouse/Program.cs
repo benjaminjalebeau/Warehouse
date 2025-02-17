@@ -1,10 +1,6 @@
 using Warehouse.Components;
 using Warehouse.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Blazored.LocalStorage;
-using System.Text;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -28,6 +24,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/Login";
+        options.LogoutPath = "/Logout";
     });
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();

@@ -1,4 +1,7 @@
-﻿
+﻿@inject AuthService AuthService
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow p-nav">
     <div class="container">
@@ -18,12 +21,28 @@
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/about">About</NavLink>
                 </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link btn btn-primary" href="/signup">Sign Up</NavLink>
-                </li>
+
+
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link btn btn-primary" href="/logout">Logout</NavLink>
+                        </li>
+                    </Authorized>
+                    
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link btn btn-primary" href="/login">Login</NavLink>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
             </ul>
         </div>
     </div>
 </nav> 
 
 
+@code
+{
+
+}
