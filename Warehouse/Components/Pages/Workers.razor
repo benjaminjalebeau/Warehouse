@@ -23,6 +23,7 @@ else
                 <th>Id</th>
                 <th aria-label="Name">Name</th>
                 <th aria-label="Email">Email</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -32,6 +33,9 @@ else
                     <td>@worker.Id</td>
                     <td>@worker.Name</td>
                     <td>@worker.Email</td>
+                    <td>
+                        <NavLink class="btn btn-danger" href="@($"/dashboard/workers/delete/{worker.Id}")">Delete</NavLink>
+                    </td>
                 </tr>
             }
         </tbody>

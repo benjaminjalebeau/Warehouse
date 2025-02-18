@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Warehouse.Data;
 using Warehouse.Models;
 
-public class DataService{
+public class DataService
+{
     private readonly WarehouseDbContext _context;
 
     public DataService(WarehouseDbContext context)
@@ -37,6 +38,12 @@ public class DataService{
     public async Task<List<Worker>> GetWorkersAsync()
     {
         return await _context.Workers.ToListAsync();
+    }
+    
+    // get a worker inf by his/her Id
+    public async Task<Worker?> GetWorkerByIdAsync(int id)
+    {
+        return await _context.Workers.FindAsync(id);
     }
 
     // Adds a new worker
@@ -93,7 +100,7 @@ public class DataService{
             .ToListAsync();
     }
 
-    
+
     // Adds a new Item to the DB
     public async Task AddInventoryItemAsync(InventoryItem item)
     {
@@ -111,14 +118,14 @@ public class DataService{
 
     //Removes an inventory item from the db.
     public async Task DeleteInventoryItemAsync(int id)
-    {   
+    {
         var item = await _context.Inventory.FindAsync(id);
         if (item != null)
         {
             _context.Inventory.Remove(item);
             await _context.SaveChangesAsync();
         }
-        
+
     }
 
     /*********Customer CRUD**********/
@@ -136,7 +143,7 @@ public class DataService{
     {
         _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
-        
+
     }
 
     //Updates a customer's info

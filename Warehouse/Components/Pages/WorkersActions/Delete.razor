@@ -1,0 +1,96 @@
+@page "/dashboard/workers/delete/{id:int}"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
+@using Microsoft.EntityFrameworkCore
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Delete Worker</PageTitle>
+
+<h1>Are you sure you want to delete worker.Name?</h1>
+
+@if (!isDeleted) // check if the variable is true or false. if false, show the form
+{
+    @if (worker is not null) // check if the worker is not null, if not, show the form
+    {
+        <h2>@worker.Name</h2>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-4">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Name:</label>
+                        <input class="form-control" value="@worker.Name" disabled /> 
+                        @* disabled in the input form deny the edition *@
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email:</label>
+                        <input class="form-control" value="@worker.Email" disabled />
+                        @* disabled in the input form deny the edition *@
+                    </div>
+         
+                    
+                    <button type="button" class="btn btn-danger" @onclick="DeleteWorker">Delete Worker</button>
+                    <NavLink class="btn btn-secondary" href="/dashboard/workers">Cancel</NavLink>
+                </form>
+            </div>
+        </div>
+
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+}
+else // if the worker is deleted, show the success message
+{
+    <p class="text-success">✅ Deleted successfully! Redirecting...</p>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Worker? worker;
+
+    private bool isDeleted = false; // will change to Trrue once the DeleteItem task is operated
+
+    protected override async Task OnInitializedAsync()
+    {
+        worker = await DataService.GetWorkerByIdAsync(Id);
+    }
+
+
+    private async Task DeleteWorker()
+    {
+        try
+        {
+            if (worker is not null)
+            {
+                await DataService.DeleteWorkerAsync(worker.Id);
+                isDeleted = true; // now, the ""Success" <p> will be shown
+                StateHasChanged(); // this is to force the UI refresh
+
+                await Task.Delay(2000); // a delay of 2 seconds so the user can see the success message
+
+                NavigationManager.NavigateTo("/dashboard/workers");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting worker: {ex.Message}");
+
+        }
+    }
+
+
+
+}
