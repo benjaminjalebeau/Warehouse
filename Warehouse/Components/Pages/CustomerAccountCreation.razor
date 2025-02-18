@@ -6,48 +6,60 @@
 @rendermode InteractiveServer
 
 <PageTitle>Customer Account Creation</PageTitle>
-<div id="AddCustomerPage">
-<h3>Customer Account Creation</h3>
+
+<div class="AccountCreationPage">
+<h1>Customer Account Creation</h1>
 
 <p>Please fill out the form to create a customer account.</p>
+<hr />
+ <div class="row">
+        <div class="col-md-4">
+        <EditForm Model="@newCustomer" OnValidSubmit="@(SaveCustomer)" FormName="CreateCustomerAccountForm">
+            <DataAnnotationsValidator/>
+            @if(!string.IsNullOrEmpty(message))
+            {
+                <div class="alert">@message</div>
+            }
 
-<EditForm Model="@newCustomer" OnValidSubmit="@(SaveCustomer)" FormName="CreateCustomerAccountForm">
-    <DataAnnotationsValidator/>
-    @if(!string.IsNullOrEmpty(message))
+            <div class="mb-3">
+                <label for="firstName" class="form-label">First Name:</label>
+                <InputText id="firstName" @bind-Value="newCustomer.FirstName" class="form-control" placeholder="ex: John"/>
+                <ValidationMessage For="@(() => newCustomer.FirstName)" class="text-danger"/>
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Last Name:</label>
+                <InputText id="lastName" @bind-Value="newCustomer.LastName" class="form-control" placeholder="ex: Doe"/>
+                <ValidationMessage For="@(() => newCustomer.LastName)"  class="text-danger"/>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <InputText id="email" @bind-Value="newCustomer.Email" type="email" class="form-control" placeholder="ex: test@example.com"/>
+                <ValidationMessage For="@(() => newCustomer.Email)"  class="text-danger"/>
+            </div>
+            
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <InputText id="password" @bind-Value="newCustomer.Password" type="password" class="form-control" placeholder="ex: password"/>
+                <ValidationMessage For="@(() => newCustomer.Password)"  class="text-danger"/>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+            
+        </EditForm>
+        </div>
+    </div>
+
+    @if (isUpdated)
     {
-        <div class="alert">@message</div>
+        <div class="alert alert-success mt-3">@successMessage</div>
     }
-
-    <div>
-        <label>First Name:</label>
-        <InputText @bind-Value="newCustomer.FirstName" placeholder="ex: John"/>
-        <ValidationMessage For="@(() => newCustomer.FirstName)" />
-    </div>
-    <div>
-        <label>Full Name:</label>
-        <InputText @bind-Value="newCustomer.LastName" placeholder="ex: Doe"/>
-        <ValidationMessage For="@(() => newCustomer.LastName)" />
-    </div>
-    <div>
-        <label>Email:</label>
-        <InputText @bind-Value="newCustomer.Email" type="email" placeholder="ex: test@example.com"/>
-        <ValidationMessage For="@(() => newCustomer.Email)" />
-    </div>
-    
-    <div>
-        <label>Password</label>
-        <InputText @bind-Value="newCustomer.Password" type="password" placeholder="ex: password"/>
-        <ValidationMessage For="@(() => newCustomer.Password)" />
-    </div>
-
-    <button type="submit">Submit</button>
-    
-</EditForm>
 </div>
-
 
 @code 
 {
+    private bool isUpdated = false;
+
+    private string? successMessage;
     private string? message;
     private Customer newCustomer = new Customer{
         FirstName = string.Empty,
@@ -69,13 +81,14 @@
             if (newCustomer.Id == 0)
             {
                 await DataService.AddCustomerAsync(newCustomer);
-                message = "Account successfully created.";
+                isUpdated = true;
                 newCustomer = new Customer {
                     FirstName = string.Empty,
                     LastName = string.Empty,
                     Email = string.Empty,
                     Password = string.Empty
                 };
+                successMessage = "Account Created! Please Login";
                 StateHasChanged();
             }
             else

@@ -11,50 +11,57 @@
 
 <PageTitle>Delete Item</PageTitle>
 
-<h1>Are you sure you want to delete this item?</h1>
+<AuthorizeView Roles="Worker">
+    <Authorized>
+    <h1>Are you sure you want to delete this item?</h1>
 
-@if (!isDeleted) // check if the variable is true or false. if false, show the form
-{
-    @if (inventoryItem is not null) // check if the inventoryItem is not null, if not, show the form
+    @if (!isDeleted) // check if the variable is true or false. if false, show the form
     {
-        <h2>@inventoryItem.Name</h2>
+        @if (inventoryItem is not null) // check if the inventoryItem is not null, if not, show the form
+        {
+            <h2>@inventoryItem.Name</h2>
 
-        <hr />
-        <div class="row">
-            <div class="col-md-4">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Name:</label>
-                        <input class="form-control" value="@inventoryItem.Name" disabled /> 
-                        @* disabled in the input form deny the edition *@
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Weight:</label>
-                        <input class="form-control" value="@inventoryItem.Weight" disabled /> 
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description:</label>
-                        <textarea class="form-control" disabled>@inventoryItem.Description</textarea>
-                    </div>
-                    <button type="button" class="btn btn-danger" @onclick="DeleteItem">Delete</button>
-                    <NavLink class="btn btn-secondary" href="/dashboard/inventory">Cancel</NavLink>
-                </form>
+            <hr />
+            <div class="row">
+                <div class="col-md-4">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Name:</label>
+                            <input class="form-control" value="@inventoryItem.Name" disabled /> 
+                            @* disabled in the input form deny the edition *@
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Weight:</label>
+                            <input class="form-control" value="@inventoryItem.Weight" disabled /> 
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description:</label>
+                            <textarea class="form-control" disabled>@inventoryItem.Description</textarea>
+                        </div>
+                        <button type="button" class="btn btn-danger" @onclick="DeleteItem">Delete</button>
+                        <NavLink class="btn btn-secondary" href="/dashboard/inventory">Cancel</NavLink>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <div>
-            <NavLink href="/dashboard/inventory"><span class="my-3 btn btn-outline-info">Back to Inventory</span></NavLink>
-        </div>
+            <div>
+                <NavLink href="/dashboard/inventory"><span class="my-3 btn btn-outline-info">Back to Inventory</span></NavLink>
+            </div>
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
     }
-    else
+    else // if the item is deleted, show the success message
     {
-        <p>Loading...</p>
+        <p class="text-success">✅ Deleted successfully! Redirecting...</p>
     }
-}
-else // if the item is deleted, show the success message
-{
-    <p class="text-success">✅ Deleted successfully! Redirecting...</p>
-}
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 
 

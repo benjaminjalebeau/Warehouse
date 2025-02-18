@@ -1,0 +1,84 @@
+@* @page "/dashboard/customer/items" *@
+@*Just for testing*@
+@page "/dashboard/customer/items/{id:int}"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+
+<PageTitle>Customer's Items</PageTitle>
+
+<AuthorizeView Roles="Worker">
+    <Authorized>
+        @if (inventory != null && inventory.Any() && customer != null)
+        {
+            <h2>Inventory of @customer.FirstName @customer.LastName</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Weight (Kg)</th>
+                        <th>Received Date</th>
+                        <th>Location</th>
+                        <th>Customer ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in inventory)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Weight</td>
+                            <td>@item.ReceivedDate.ToString("yyyy-MM-dd")</td>
+                            <td>@item.LocationId</td>
+                            <td>@item.CustomerId</td>
+                            <td>
+                                <NavLink class="btn btn-secondary" href="@($"/dashboard/inventory/edit/{item.Id}")">Edit</NavLink>
+                                <NavLink class="btn btn-danger" href="@($"/dashboard/inventory/delete/{item.Id}")">Delete</NavLink>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else if(customer != null)
+        {
+            <p>No items found for @customer.FirstName @customer.LastName</p>
+        }
+        else
+        {
+            <p>Something went wrong.</p>
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+    private List<InventoryItem> inventory = new();
+    private Customer? customer;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        inventory = await DataService.GetInventoryByCustomerIdAsync(Id);
+        customer = await DataService.GetCustomerByIdAsync(Id);
+    }
+
+}
+
+
+

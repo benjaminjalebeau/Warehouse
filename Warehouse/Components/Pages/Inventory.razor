@@ -7,51 +7,67 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
+<PageTitle>Warehouse Inventory</PageTitle>
 
+<AuthorizeView Roles="Worker">
+    <Authorized>
+        <h3>Inventory </h3>
+        @* Link for the create component *@
+        <NavLink href="/dashboard/inventory/create"><span class="btn btn-success my-4">Create New Item</span></NavLink>
 
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Weight(Kg)</th>
+                    <th>Recieved Date</th>
+                    <th>Location</th>
+                    <th>Customer Name & ID</th>
+                    <th>Actions</th>
 
-<h3>Inventory </h3>
-@* Link for the create component *@
-<NavLink href="/dashboard/inventory/create"><span class="btn btn-success my-4">Create New Item</span></NavLink>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in joinedItems)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Weight</td>
+                        <td>@item.ReceivedDate</td>
+                        <td>@item.LocationId</td>
+                        <td>@item.CustomerName :@item.CustomerId</td>
+                        <td>
+                            <NavLink class="btn btn-secondary" href="@($"/dashboard/inventory/edit/{item.Id}")">Edit</NavLink>
+                            <NavLink class="btn btn-danger" href="@($"/dashboard/inventory/delete/{item.Id}")">Delete</NavLink>
+                        </td>
+                    </tr>
+                }
+            </tbody>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Item Name</th>
-            <th>Weight(Kg)</th>
-            @* <th>Description</th> *@
-            <th>Recieved Date</th>
-            <th>Location</th>
-            <th>Actions</th>
-            <th>Customer (ID)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in inventory)
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Weight</td>
-                @* <td>@item.Description</td> *@
-                <td>@item.ReceivedDate</td>
-                <td>@item.LocationId</td>
-                <td>@item.CustomerId</td>
-                <td>
-                    <NavLink class="btn btn-secondary" href="@($"/dashboard/inventory/edit/{item.Id}")">Edit</NavLink>
-                    <NavLink class="btn btn-danger" href="@($"/dashboard/inventory/delete/{item.Id}")">Delete</NavLink>
-                </td>
-            </tr>
-        }
-    </tbody>
+        </table>
 
-</table>
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 
 @code {
 
+    public class ExtendedInventory : InventoryItem
+    {
+        public string CustomerName {get; set;} = string.Empty;
 
+    }
 
     private List<InventoryItem> inventory = new();
+    private List<Customer> customers = new();
+    private List<ExtendedInventory> joinedItems = new();
+
+    
+
     private InventoryItem newItem = new  InventoryItem{
         Name = "TestBox",
         Weight = 1.55F,
@@ -63,6 +79,22 @@
     protected override async Task OnInitializedAsync()
     {
         inventory = await DataService.GetInventoryAsync();
+        customers = await DataService.GetCustomersAsync();
+
+        var result = from item in inventory
+                        join customer in customers
+                        on item.CustomerId equals customer.Id
+                        select new ExtendedInventory
+                        {
+                            Name = item.Name,
+                            Weight = item.Weight,
+                            ReceivedDate = item.ReceivedDate,
+                            LocationId = item.LocationId,
+                            CustomerId = item.CustomerId,
+                            CustomerName = customer.FirstName + " " + customer.LastName,
+                            Id = item.Id
+                        };
+        joinedItems = result.ToList();
     }
 
     private async Task SaveInventory()

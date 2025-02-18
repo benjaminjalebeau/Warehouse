@@ -1,6 +1,6 @@
 @* @page "/dashboard/customer/items" *@
 @*Just for testing*@
-@page "/dashboard/customer/items/{id:int}"
+@page "/dashboard/customers/items"
 @using Warehouse.Components.Layout
 @layout DashboardLayout
 @using Warehouse.Data;
@@ -8,60 +8,79 @@
 @inject DataService DataService
 @inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 @rendermode InteractiveServer
 
 
 
-@* @if (customer is not null)
-{
-    <h2>@customer.Name</h2>
-} *@
-
-<h2>Customer Inventory</h2>
+<AuthorizeView Roles="Customer">
+    <Authorized>
+        <h2>Customer Inventory</h2>
 
 
-@if (inventory != null && inventory.Any())
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Item Name</th>
-                <th>Weight (Kg)</th>
-                <th>Received Date</th>
-                <th>Location</th>
-                <th>Customer ID</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in inventory)
-            {
-                <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Weight</td>
-                    <td>@item.ReceivedDate.ToString("yyyy-MM-dd")</td>
-                    <td>@item.LocationId</td>
-                    <td>@item.CustomerId</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No items found for this customer.</p>
-}
+        @if (inventory != null && inventory.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Weight (Kg)</th>
+                        <th>Received Date</th>
+                        <th>Location</th>
+                        <th>Customer ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in inventory)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Weight</td>
+                            <td>@item.ReceivedDate.ToString("yyyy-MM-dd")</td>
+                            <td>@item.LocationId</td>
+                            <td>@item.CustomerId</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No items found for this customer.</p>
+        }
+
+
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 
 @code {
 
-    [Parameter]
-    public int Id { get; set; }
+    private Customer? customer;
+    private string? email;
     private List<InventoryItem> inventory = new();
 
 
+    // Load customer data when the component initializes
     protected override async Task OnInitializedAsync()
     {
-        inventory = await DataService.GetInventoryByCustomerIdAsync(Id);
+        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        
+        email = user.Identity?.Name;
+
+        if (!string.IsNullOrEmpty(email))
+        {
+            customer = await DataService.GetCustomerByEmailAsync(email);
+            if (customer != null)
+            {
+                inventory = await DataService.GetInventoryByCustomerIdAsync(customer.Id);
+            }
+        }
     }
 
 }

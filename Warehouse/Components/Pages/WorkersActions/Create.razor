@@ -1,0 +1,111 @@
+@page "/dashboard/workers/create"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
+@using Warehouse.Data;
+@using Warehouse.Models;
+@using System.ComponentModel.DataAnnotations
+@inject DataService DataService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Add Worker</PageTitle>
+
+<AuthorizeView Roles="Worker">
+    <Authorized Context="authContext"> 
+    <h1>Worker Account Creation</h1>
+
+
+    <p>Please fill out the form to create a worker account.</p>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm Model="@newWorker" OnValidSubmit="@(SaveWorker)" FormName="CreateWorkerAccountForm">
+                <DataAnnotationsValidator/>
+                @if(!string.IsNullOrEmpty(message))
+                {
+                    <div class="alert">@message</div>
+                }
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name:</label>
+                    <InputText id="name" @bind-Value="newWorker.Name" class="form-control" placeholder="ex: John Doe"/>
+                    <ValidationMessage For="@(() => newWorker.Name)" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="newWorker.Email" type="email"  class="form-control" placeholder="ex: test@example.com"/>
+                    <ValidationMessage For="@(() => newWorker.Email)" class="text-danger"/>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <InputText id="password" @bind-Value="newWorker.Password" type="password"  class="form-control" placeholder="ex: password"/>
+                    <ValidationMessage For="@(() => newWorker.Password)" class="text-danger"/>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+                
+            </EditForm>
+        </div>
+    </div>
+
+    @if (isUpdated)
+    {
+        <div class="alert alert-success mt-3">@successMessage</div>
+    }
+
+    <div>
+        <NavLink href="/dashboard"><span class="my-3 btn btn-outline-info">Back to Dashboard</span></NavLink>
+    </div>
+
+    </Authorized>
+    <NotAuthorized Context="authContext">
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code 
+{
+    private string? message;
+    private string? successMessage;
+
+    private bool isUpdated = false;
+    private Worker newWorker = new Worker{
+        Name = string.Empty,
+        Email = string.Empty,
+        Password = string.Empty
+    };
+
+    private async Task SaveWorker()
+    {
+        var checkEmail = await DataService.IsEmailTakenAsync(newWorker.Email);
+
+        if(checkEmail)
+        {
+            message = "Email is already in use.";
+        }
+        else 
+        {
+            if (newWorker.Id == 0)
+            {
+                await DataService.AddWorkerAsync(newWorker);
+                isUpdated = true;
+                successMessage = "Account successfully created. Redirecting";
+                newWorker = new Worker {
+                    Name = string.Empty,
+                    Email = string.Empty,
+                    Password = string.Empty
+                };
+                StateHasChanged();
+
+                await Task.Delay(1000);
+                NavigationManager.NavigateTo("/dashboard/workers");
+            }
+            else
+            {
+                message = "Something went wrong.";
+            }
+        }  
+    }
+}

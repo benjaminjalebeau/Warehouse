@@ -1,22 +1,25 @@
 ﻿@page "/"
 @using Warehouse.Components.Pages
+@inject NavigationManager NaviagationManager
 
 <PageTitle>Home</PageTitle>
 <div class="main-container">
-    <AuthorizeView>
+    <AuthorizeView Roles="Worker">
         <Authorized>
-            <p>Hello, @context.User.Identity?.Name!</p>
+            <p class="alert alert-success mt-3">You're Logged In as a Worker! Select the Dashboard</p>
         </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="Customer">
+        <Authorized>
+            <p class="alert alert-success mt-3">You're Logged In as a Customer! Select the Dashboard</p>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView>
         <NotAuthorized>
-            <p>You're not authorized.</p>
+            <p class="alert alert-warning">Please Login</p>
         </NotAuthorized>
     </AuthorizeView>
 
-    <AuthorizeView Roles="Worker">
-        <Authorized>
-            <p>WORKER</p>
-        </Authorized>
-    </AuthorizeView>
 
     <div class="heading-container">
         <h1>Welcome to Warehouse Management App (WMA)</h1>
@@ -35,12 +38,12 @@
     </section>
     <section class="sec-two">
 
-        <p>If you don’t have an account yet, <a href="">Sign Up</a> now and start optimizing your warehouse management.
+        <p>If you don’t have an account yet, sign up now and start optimizing your warehouse management.
             If you’re
             already a
             user, log in to access your inventory
         </p>
-        <button class="btn btn-primary"> Join WMA</button>
+        <NavLink href="/customerAccountCreation"><span class="btn btn-primary">Join WMA</span></NavLink>
 
     </section>
     <div class="heading-container">
@@ -88,8 +91,8 @@
 
     <section class="call-btns">
         <div>
-            <button class="btn btn-primary"> Sign Up</button>
-            <button class="btn btn-secondary"> log In</button>
+            <NavLink href="/CustomerAccountCreation"><span class="btn btn-primary">Sign Up</span></NavLink>
+            <NavLink href="/login"><span class="btn btn-secondary">Log In</span></NavLink>
         </div>
     </section>
 

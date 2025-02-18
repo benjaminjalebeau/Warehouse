@@ -4,16 +4,25 @@
 @using System.Security.Claims
 @inject AuthService AuthService
 @inject NavigationManager NavManager
-
+<div class="loginContainer">
 <h3>Login</h3>
+    <AuthorizeView>
+        <Authorized>
+            <p>You're currently logged in</p>
+        </Authorized>
+        <NotAuthorized>
+            <p>You're currently logged out</p>
+        </NotAuthorized>
+    </AuthorizeView>
 <EditForm method="post" FormName="ClickLogin" OnSubmit="HandleLogin" Model="UserCredentials">
 
     <InputText @bind-Value="UserCredentials.Username" placeholder="Username"></InputText>
     <InputText @bind-Value="UserCredentials.Password" placeholder="Password" />
 
-    <button type="submit"> SignIn</button>
+    <button type="submit" class="btn btn-primary"> SignIn</button>
 
 </EditForm>
+</div>
 
 @code
 {

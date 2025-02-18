@@ -11,64 +11,70 @@
 
 <PageTitle>Create Item</PageTitle>
 
-<h1>Create a new Inventory Item</h1>
-@if (!isCreated)
-{
-    <h2>Item</h2>
+<AuthorizeView Roles="Worker">
+    <Authorized Context="authContext">
+    <h1>Create a new Inventory Item</h1>
+    @if (!isCreated)
+    {
 
-    <hr />
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="newItem" OnValidSubmit="SaveInventory">
-                <DataAnnotationsValidator />
-                <ValidationSummary class="text-danger" role="alert" />
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name:</label>
-                    <InputText id="name" @bind-Value="newItem.Name" class="form-control" />
-                    <ValidationMessage For="() => newItem.Name" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="weight" class="form-label">weight:</label>
-                    <InputNumber id="weight" @bind-Value="newItem.Weight" class="form-control"
-                        placeholder="Weight of Item in KG" />
-                    <ValidationMessage For="() => newItem.Weight" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description:</label>
-                    <InputText id="description" @bind-Value="newItem.Description" class="form-control"
-                        placeholder="Description of Item" />
-                    <ValidationMessage For="() => newItem.Description" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="receiveDate" class="form-label">Receive Date:</label>
-                    <InputDate id="receiveDate" @bind-Value="newItem.ReceivedDate" class="form-control" />
-                    <ValidationMessage For="() => newItem.ReceivedDate" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="location" class="form-label">Location:</label>
-                    <InputText id="location" class="form-control" @bind-Value="newItem.LocationId" />
-                    <ValidationMessage For="() => newItem.LocationId" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="customerid" class="form-label">Customer Id:</label>
-                    <InputNumber id="customerid" @bind-Value="newItem.CustomerId" class="form-control"
-                        placeholder="Example: 3" />
-                    <ValidationMessage For="() => newItem.CustomerId" class="text-danger" />
-                </div>
-                <button type="submit" class="btn btn-primary">Create</button>
-            </EditForm>
+        <hr />
+        <div class="row">
+            <div class="col-md-4">
+                <EditForm method="post" Model="newItem" OnValidSubmit="SaveInventory">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" role="alert" />
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name:</label>
+                        <InputText id="name" @bind-Value="newItem.Name" class="form-control" />
+                        <ValidationMessage For="() => newItem.Name" class="text-danger" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="weight" class="form-label">weight:</label>
+                        <InputNumber id="weight" @bind-Value="newItem.Weight" class="form-control"
+                            placeholder="Weight of Item in KG" />
+                        <ValidationMessage For="() => newItem.Weight" class="text-danger" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description:</label>
+                        <InputText id="description" @bind-Value="newItem.Description" class="form-control"
+                            placeholder="Description of Item" />
+                        <ValidationMessage For="() => newItem.Description" class="text-danger" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="receiveDate" class="form-label">Receive Date:</label>
+                        <InputDate id="receiveDate" @bind-Value="newItem.ReceivedDate" class="form-control" />
+                        <ValidationMessage For="() => newItem.ReceivedDate" class="text-danger" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location:</label>
+                        <InputText id="location" class="form-control" @bind-Value="newItem.LocationId" />
+                        <ValidationMessage For="() => newItem.LocationId" class="text-danger" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerid" class="form-label">Customer Id:</label>
+                        <InputNumber id="customerid" @bind-Value="newItem.CustomerId" class="form-control"
+                            placeholder="Example: 3" />
+                        <ValidationMessage For="() => newItem.CustomerId" class="text-danger" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </EditForm>
+            </div>
         </div>
-    </div>
 
-    <div>
-        <NavLink href="/dashboard/inventory"><span class="my-3 btn btn-outline-info">Back to Inventory</span></NavLink>
-    </div>
+        <div>
+            <NavLink href="/dashboard/inventory"><span class="my-3 btn btn-outline-info">Back to Inventory</span></NavLink>
+        </div>
 
-}
-else
-{
-    <p>✅Item created successfully</p>
-}
+    }
+    else
+    {
+        <p>✅Item created successfully</p>
+    }
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 
 @code {

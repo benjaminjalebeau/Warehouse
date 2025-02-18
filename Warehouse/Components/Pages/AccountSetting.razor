@@ -1,73 +1,139 @@
-@page "/account/setting/{id:int}"
+@page "/account/setting"
 @using Warehouse.Components.Layout
 @layout DashboardLayout
 @using Microsoft.EntityFrameworkCore
 @using Warehouse.Data;
 @using Warehouse.Models;
+
 @inject DataService DataService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@rendermode InteractiveServer
 
-<PageTitle>Edit Customer Account</PageTitle>
+<PageTitle>Edit Account</PageTitle>
 
-<h1>Edit Customer Information</h1>
+
 
 <hr />
+@*View for Customers*@
+<AuthorizeView Roles="Customer">
+    <Authorized Context="authContext">
+    @if (customer is not null)
+    {
+        <h1>Edit Customer Information</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <EditForm Model="@customer" OnValidSubmit="UpdateAccount" FormName="EditCustomerForm">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" role="alert" />
 
-@if (customer is not null)
-{
-    <div class="row">
-        <div class="col-md-6">
-            <EditForm Model="customer" OnValidSubmit="UpdateCustomer">
-                <DataAnnotationsValidator />
-                <ValidationSummary class="text-danger" role="alert" />
+                    <!-- First Name -->
+                    <div class="mb-3">
+                        <label for="firstName" class="form-label">First Name:</label>
+                        <InputText id="firstName" @bind-value="customer.FirstName" class="form-control" />
+                        <ValidationMessage For="() => customer.FirstName" class="text-danger" />
+                    </div>
 
-                <!-- First Name -->
-                <div class="mb-3">
-                    <label for="firstName" class="form-label">First Name:</label>
-                    <InputText id="firstName" @bind-Value="customer.FirstName" class="form-control" />
-                    <ValidationMessage For="() => customer.FirstName" class="text-danger" />
-                </div>
+                    <!-- Last Name -->
+                    <div class="mb-3">
+                        <label for="lastName" class="form-label">Last Name:</label>
+                        <InputText id="lastName" @bind-value="customer.LastName" class="form-control" />
+                        <ValidationMessage For="() => customer.LastName" class="text-danger" />
+                    </div>
 
-                <!-- Last Name -->
-                <div class="mb-3">
-                    <label for="lastName" class="form-label">Last Name:</label>
-                    <InputText id="lastName" @bind-Value="customer.LastName" class="form-control" />
-                    <ValidationMessage For="() => customer.LastName" class="text-danger" />
-                </div>
-
-                <!-- Email disabled-->
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email:</label>
-                    <InputText id="email" @bind-Value="customer.Email" class="form-control" disabled />
-                    <ValidationMessage For="() => customer.Email" class="text-danger" />
-                </div>
-
-
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password:</label>
-                    <InputText id="password" type="password" @bind-Value="customer.Password" class="form-control" />
-                    <ValidationMessage For="() => customer.Password" class="text-danger" />
-                </div>
+                    <!-- Email disabled-->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <InputText id="email" @bind-value="customer.Email" class="form-control" disabled />
+                        <ValidationMessage For="() => customer.Email" class="text-danger" />
+                    </div>
 
 
-                <button type="submit" class="btn btn-primary">Update</button>
-            </EditForm>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password:</label>
+                        <InputText id="password" type="password" @bind-value="customer.Password" class="form-control" />
+                        <ValidationMessage For="() => customer.Password" class="text-danger" />
+                    </div>
 
-            @if (isUpdated)
-            {
-                <div class="alert alert-success mt-3">Customer information updated successfully!</div>
-            }
+
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </EditForm>
+
+                @if (isUpdated)
+                {
+                    <div class="alert alert-success mt-3">@message</div>
+                }
+            </div>
         </div>
-    </div>
-}
-else if (customer == null)
-{
-    <p>No information was found related to that user.</p>
-}
-else
-{
-    <p>Loading customer information...</p>
-}
+    }
+    else if (customer == null)
+    {
+        <p>No information was found related to that user.</p>
+    }
+    else
+    {
+        <p>Loading customer information...</p>
+    }
+
+    </Authorized>
+</AuthorizeView>
+@*View for Customers*@
+<AuthorizeView Roles="Worker">
+    <Authorized Context="authContext">
+    @if (worker is not null)
+    {
+        <h1>Edit Worker Information</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <EditForm Model="@worker" OnValidSubmit="UpdateAccount" FormName="EditWorkerForm">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" role="alert" />
+
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label for="Name" class="form-label">Name:</label>
+                        <InputText id="Name" @bind-value="worker.Name" class="form-control" />
+                        <ValidationMessage For="() => worker.Name" class="text-danger" />
+                    </div>
+
+                    <!-- Email disabled-->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <InputText id="email" @bind-value="worker.Email" class="form-control" disabled />
+                        <ValidationMessage For="() => worker.Email" class="text-danger" />
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password:</label>
+                        <InputText id="password" type="password" @bind-value="worker.Password" class="form-control" />
+                        <ValidationMessage For="() => worker.Password" class="text-danger" />
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </EditForm>
+
+                @if (isUpdated)
+                {
+                    <div class="alert alert-success mt-3">@message</div>
+                }
+            </div>
+        </div>
+    }
+    else if (worker == null)
+    {
+        <p>No information was found related to that user.</p>
+    }
+    else
+    {
+        <p>Loading worker information...</p>
+    }
+
+    </Authorized>
+</AuthorizeView>
+    
+
 
 <div>
     <NavLink href="/dashboard">
@@ -76,38 +142,96 @@ else
 </div>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+    
+    private Customer customer = new Customer{
+        Id = 0,
+        FirstName = string.Empty,
+        LastName = string.Empty,
+        Email = string.Empty,
+        Password = string.Empty
+    };
 
-    private Customer? customer;
+    private Worker worker = new Worker{
+        Id = 0,
+        Name = string.Empty,
+        Email = string.Empty,
+        Password = string.Empty
+    };
+
+    private Customer? user;
+    private Worker? workerUser;
     private bool isUpdated = false;
 
-    // Load customer data when the component initializes
+    private string? message;
+
+    // Load customer data when the component initializes, inserts values into the form.
     protected override async Task OnInitializedAsync()
     {
-        customer = await DataService.GetCustomerByIdAsync(Id);
-
-        @* if (customer == null)
+        if (customer.Id == 0)
         {
-            NavigationManager.NavigateTo("/dashboard/customers");
-        } *@
+            var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+            var email = authstate.User.Identity?.Name;
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                // Checks if either a worker or customer, and then populates initial form values
+                user = await DataService.GetCustomerByEmailAsync(email);
+                if (user != null)
+                {
+                    customer.FirstName = user.FirstName;
+                    customer.LastName = user.LastName;
+                    customer.Email = user.Email;
+                    customer.Id = user.Id;
+                    customer.Password = user.Password;
+                    return;
+                }
+                workerUser = await DataService.GetWorkerByEmailAsync(email);
+                if (workerUser != null)
+                {
+                    worker.Name = workerUser.Name;
+                    worker.Email = workerUser.Email;
+                    worker.Id = workerUser.Id;
+                    worker.Password = workerUser.Password;
+                    return;
+                }
+            }
+            
+        }
     }
 
-    // Update customer info
-    private async Task UpdateCustomer()
+    // Update customer info bases on form info.
+    private async Task UpdateAccount()
     {
         try
         {
-            if (customer is not null)
+            if (customer.Id != 0 && user != null)
             {
-                await DataService.UpdateCustomerAsync(customer);
+                user.FirstName = customer.FirstName;
+                user.LastName = customer.LastName;
+                user.Password = customer.Password;
+                user.Email = customer.Email;
+                await DataService.UpdateCustomerAsync(user);
                 isUpdated = true;
+                message = "Customer Account Info Updated!";
 
                 StateHasChanged(); // Force UI refresh
 
-                // Wait 2 seconds and return to the customer list
-                await Task.Delay(2000);
-                NavigationManager.NavigateTo("/dashboard/customers");
+                await Task.Delay(1000);
+                NavigationManager.NavigateTo("/dashboard");
+            }
+            if (worker.Id != 0 && workerUser != null)
+            {
+                workerUser.Name = worker.Name;
+                workerUser.Password = worker.Password;
+                workerUser.Email = worker.Email;
+                await DataService.UpdateWorkerAsync(workerUser);
+                isUpdated = true;
+                message = "Worker Account Info Updated!";
+
+                StateHasChanged(); // Force UI refresh
+
+                await Task.Delay(1000);
+                NavigationManager.NavigateTo("/dashboard");
             }
         }
         catch (Exception ex)
@@ -115,4 +239,6 @@ else
             Console.WriteLine($"Error updating customer: {ex.Message}");
         }
     }
+
+    
 }
