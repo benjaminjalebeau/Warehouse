@@ -11,13 +11,14 @@
 
 <PageTitle>Delete Worker</PageTitle>
 
-<h1>Are you sure you want to delete worker.Name?</h1>
 
+<AuthorizeView Roles="Worker">
+    <Authorized>
 @if (!isDeleted) // check if the variable is true or false. if false, show the form
 {
     @if (worker is not null) // check if the worker is not null, if not, show the form
     {
-        <h2>@worker.Name</h2>
+        <h2>Are you sure you want to delete @worker.Name?</h2>
 
         <hr />
         <div class="row">
@@ -52,6 +53,11 @@ else // if the worker is deleted, show the success message
 {
     <p class="text-success">✅ Deleted successfully! Redirecting...</p>
 }
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 
 

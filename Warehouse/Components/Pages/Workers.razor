@@ -9,7 +9,10 @@
 
 <PageTitle>Workers</PageTitle>
 
+<AuthorizeView Roles="Worker">
+    <Authorized>
 <h1>Workers</h1>
+<NavLink href="/dashboard/workers/create"><span class="btn btn-success my-4">Add New Worker</span></NavLink>
 
 @if (PagedWorkers.Count == 0)
 {
@@ -47,6 +50,12 @@ else
         <button @onclick="NextPage" disabled="@(!CanGoNext)">Next ⏩</button>
     </div>
 }
+
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private List<Worker> workers = new();
