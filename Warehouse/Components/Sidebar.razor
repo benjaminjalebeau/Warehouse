@@ -1,4 +1,8 @@
 @using Warehouse.Components
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject DataService DataService
+
 
 <div>
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
@@ -11,36 +15,49 @@
                     <i class="fas fa-chart-area fa-fw me-3"></i><span>Dashboard</span>
                 </NavLink>
 
-                <NavLink href="/dashboard/customers" class="list-group-item list-group-item-action py-2 ripple"
+
+                <NavLink href="/dashboard/customers/items" class="list-group-item list-group-item-action py-2 ripple"
                     ActiveClass="active">
-                    <i class="fas fa-chart-area fa-fw me-3"></i><span>Customers</span>
+                    <i class="fas fa-chart-area fa-fw me-3"></i><span>items per Customer</span>
                 </NavLink>
 
-                <NavLink href="/dashboard/inventory" class="list-group-item list-group-item-action py-2 ripple"
-                    ActiveClass="active">
-                    <i class="fas fa-lock fa-fw me-3"></i><span>Inventory</span>
-                </NavLink>
 
-                <NavLink href="/dashboard/workers" class="list-group-item list-group-item-action py-2 ripple"
-                    ActiveClass="active">
-                    <i class="fas fa-lock fa-fw me-3"></i><span>Workers</span>
-                </NavLink>
 
-                <NavLink href="/account" class="list-group-item list-group-item-action py-2 ripple"
+                <AuthorizeView Roles="Worker">
+                    <Authorized>
+                        <NavLink href="/dashboard/customers" class="list-group-item list-group-item-action py-2 ripple"
+                            ActiveClass="active">
+                            <i class="fas fa-chart-area fa-fw me-3"></i><span>Customers</span>
+                        </NavLink>
+
+                        <NavLink href="/dashboard/inventory" class="list-group-item list-group-item-action py-2 ripple"
+                            ActiveClass="active">
+                            <i class="fas fa-lock fa-fw me-3"></i><span>Inventory</span>
+                        </NavLink>
+
+                        <NavLink href="/dashboard/workers" class="list-group-item list-group-item-action py-2 ripple"
+                            ActiveClass="active">
+                            <i class="fas fa-lock fa-fw me-3"></i><span>Workers</span>
+                        </NavLink>
+                    </Authorized>
+                </AuthorizeView>
+                <NavLink href="/account/setting" class="list-group-item list-group-item-action py-2 ripple"
                     ActiveClass="active">
                     <i class="fas fa-chart-bar fa-fw me-3"></i><span>Account Setting</span>
                 </NavLink>
 
-                <NavLink href="/account/signout" class="list-group-item list-group-item-action py-2 ripple"
-                    ActiveClass="active">
-                    <i class="fas fa-chart-bar fa-fw me-3"></i><span>Sign Out</span>
-                </NavLink>
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink href="/account/signout" class="list-group-item list-group-item-action py-2 ripple"
+                            ActiveClass="active">
+                            <i class="fas fa-chart-bar fa-fw me-3"></i><span>Sign Out</span>
+                        </NavLink>
+                    </Authorized>
+                </AuthorizeView>
+
             </div>
         </div>
     </nav>
 </div>
 
 
-@* <main style="margin-top: 58px;">
-    <div class="container pt-4"></div>
-</main> *@

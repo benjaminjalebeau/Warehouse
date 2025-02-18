@@ -1,0 +1,118 @@
+@page "/account/setting/{id:int}"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
+@using Microsoft.EntityFrameworkCore
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Customer Account</PageTitle>
+
+<h1>Edit Customer Information</h1>
+
+<hr />
+
+@if (customer is not null)
+{
+    <div class="row">
+        <div class="col-md-6">
+            <EditForm Model="customer" OnValidSubmit="UpdateCustomer">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" role="alert" />
+
+                <!-- First Name -->
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name:</label>
+                    <InputText id="firstName" @bind-Value="customer.FirstName" class="form-control" />
+                    <ValidationMessage For="() => customer.FirstName" class="text-danger" />
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name:</label>
+                    <InputText id="lastName" @bind-Value="customer.LastName" class="form-control" />
+                    <ValidationMessage For="() => customer.LastName" class="text-danger" />
+                </div>
+
+                <!-- Email disabled-->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="customer.Email" class="form-control" disabled />
+                    <ValidationMessage For="() => customer.Email" class="text-danger" />
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <InputText id="password" type="password" @bind-Value="customer.Password" class="form-control" />
+                    <ValidationMessage For="() => customer.Password" class="text-danger" />
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">Update</button>
+            </EditForm>
+
+            @if (isUpdated)
+            {
+                <div class="alert alert-success mt-3">Customer information updated successfully!</div>
+            }
+        </div>
+    </div>
+}
+else if (customer == null)
+{
+    <p>No information was found related to that user.</p>
+}
+else
+{
+    <p>Loading customer information...</p>
+}
+
+<div>
+    <NavLink href="/dashboard">
+        <span class="my-3 btn btn-outline-info">Back to Dashboard</span>
+    </NavLink>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Customer? customer;
+    private bool isUpdated = false;
+
+    // Load customer data when the component initializes
+    protected override async Task OnInitializedAsync()
+    {
+        customer = await DataService.GetCustomerByIdAsync(Id);
+
+        @* if (customer == null)
+        {
+            NavigationManager.NavigateTo("/dashboard/customers");
+        } *@
+    }
+
+    // Update customer info
+    private async Task UpdateCustomer()
+    {
+        try
+        {
+            if (customer is not null)
+            {
+                await DataService.UpdateCustomerAsync(customer);
+                isUpdated = true;
+
+                StateHasChanged(); // Force UI refresh
+
+                // Wait 2 seconds and return to the customer list
+                await Task.Delay(2000);
+                NavigationManager.NavigateTo("/dashboard/customers");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating customer: {ex.Message}");
+        }
+    }
+}

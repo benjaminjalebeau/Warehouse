@@ -1,0 +1,59 @@
+@page "/dashboard/customers/items"
+@using Warehouse.Components.Layout
+@layout DashboardLayout
+@using Microsoft.EntityFrameworkCore
+@using Warehouse.Data;
+@using Warehouse.Models;
+@inject DataService DataService
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Search Products by Customer</PageTitle>
+
+<h1>Search Items</h1>
+
+<hr />
+<h2>Search Products by Customer:</h2>
+
+<p>Please, enter debugging Customer ID:</p>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="searchRequest" OnValidSubmit="SearchCustomerInventory">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="mb-3">
+                <label for="customerid" class="form-label">Customer ID:</label>
+                <InputNumber id="customerid" @bind-Value="searchRequest.CustomerId" class="form-control" />
+                <ValidationMessage For="() => searchRequest.CustomerId" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <NavLink href="/dashboard"><span class="my-3 btn btn-outline-info">Back to Inventory</span></NavLink>
+</div>
+
+
+
+@code {
+    // this is a class 
+    private SearchRequest searchRequest = new SearchRequest();
+
+    private void SearchCustomerInventory()
+    {
+        if (searchRequest.CustomerId > 0)
+        {
+            NavigationManager.NavigateTo($"/dashboard/customer/items/{searchRequest.CustomerId}");
+        }
+    }
+    public class SearchRequest
+    {
+        public int CustomerId { get; set; }
+    }
+
+
+}
