@@ -1,13 +1,64 @@
 @page "/dashboard"
-@using Warehouse.Components.Layout
+@attribute [Authorize]
 @layout DashboardLayout
+@using Warehouse.Components.Layout
 @using Warehouse.Components
+@using Warehouse.Models
+@inject DataService DataService
+@inject AuthenticationStateProvider AuthStateProvider
+
 @* @rendermode InteractiveServer *@
-
-
-<PageTitle>Dashboard</PageTitle>
-
 
 <h1>Dashboard</h1>
 
-<p>Welcome to the dashboard!</p>
+<PageTitle>Dashboard</PageTitle>
+
+<AuthorizeView Roles="Customer">
+    <Authorized>
+        <h2>Hello @name!</h2>
+        <p>Email: @email</p>
+        <p>You can view all of your stored inventory or update your account info.</p>
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Roles="Worker">
+    <Authorized>
+        <h2>Hello @name!</h2>
+        <p>Email: @email</p>
+    </Authorized>
+</AuthorizeView>
+
+
+
+@code
+{
+    private Worker? worker;
+    private Customer? customer;
+    private string? name;
+    private string? email;
+
+    // This pulls cookie data and searches the database for a matching account.
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        
+        email = user.Identity?.Name;
+
+        if (!string.IsNullOrEmpty(email))
+        {
+            worker = await DataService.GetWorkerByEmailAsync(email);
+            if (worker != null)
+            {
+                name = worker.Name;
+            }
+
+            customer = await DataService.GetCustomerByEmailAsync(email);
+            if (customer != null)
+            {
+                name = customer.FirstName + " " + customer.LastName;
+            }
+        }
+        
+    }
+
+}

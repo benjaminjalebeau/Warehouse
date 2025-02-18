@@ -1,11 +1,13 @@
-@page "/account/setting/{id:int}"
+@page "/account/setting"
 @using Warehouse.Components.Layout
 @layout DashboardLayout
 @using Microsoft.EntityFrameworkCore
 @using Warehouse.Data;
 @using Warehouse.Models;
+
 @inject DataService DataService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Edit Customer Account</PageTitle>
 
@@ -17,35 +19,35 @@
 {
     <div class="row">
         <div class="col-md-6">
-            <EditForm Model="customer" OnValidSubmit="UpdateCustomer">
+            <EditForm Model="@customer" OnValidSubmit="@UpdateCustomer" FormName="EditCustomerForm">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" role="alert" />
 
                 <!-- First Name -->
                 <div class="mb-3">
                     <label for="firstName" class="form-label">First Name:</label>
-                    <InputText id="firstName" @bind-Value="customer.FirstName" class="form-control" />
+                    <InputText id="firstName" @bind-value="customer.FirstName" class="form-control" />
                     <ValidationMessage For="() => customer.FirstName" class="text-danger" />
                 </div>
 
                 <!-- Last Name -->
                 <div class="mb-3">
                     <label for="lastName" class="form-label">Last Name:</label>
-                    <InputText id="lastName" @bind-Value="customer.LastName" class="form-control" />
+                    <InputText id="lastName" @bind-value="customer.LastName" class="form-control" />
                     <ValidationMessage For="() => customer.LastName" class="text-danger" />
                 </div>
 
                 <!-- Email disabled-->
                 <div class="mb-3">
                     <label for="email" class="form-label">Email:</label>
-                    <InputText id="email" @bind-Value="customer.Email" class="form-control" disabled />
+                    <InputText id="email" @bind-value="customer.Email" class="form-control" disabled />
                     <ValidationMessage For="() => customer.Email" class="text-danger" />
                 </div>
 
 
                 <div class="mb-3">
                     <label for="password" class="form-label">Password:</label>
-                    <InputText id="password" type="password" @bind-Value="customer.Password" class="form-control" />
+                    <InputText id="password" type="password" @bind-value="customer.Password" class="form-control" />
                     <ValidationMessage For="() => customer.Password" class="text-danger" />
                 </div>
 
@@ -55,7 +57,7 @@
 
             @if (isUpdated)
             {
-                <div class="alert alert-success mt-3">Customer information updated successfully!</div>
+                <div class="alert alert-success mt-3">@message</div>
             }
         </div>
     </div>
@@ -76,38 +78,57 @@ else
 </div>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
-
+    
     private Customer? customer;
     private bool isUpdated = false;
+
+    private string? email;
+
+    private string? message;
 
     // Load customer data when the component initializes
     protected override async Task OnInitializedAsync()
     {
-        customer = await DataService.GetCustomerByIdAsync(Id);
 
-        @* if (customer == null)
+        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        
+        email = user.Identity?.Name;
+
+        if (!string.IsNullOrEmpty(email))
         {
-            NavigationManager.NavigateTo("/dashboard/customers");
-        } *@
+            var userInfo = await DataService.GetCustomerByEmailAsync(email);
+            if (userInfo is not null)
+            {
+                customer = new Customer{
+                Id = userInfo.Id,
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+                Email = userInfo.Email,
+                Password = userInfo.Password
+                };
+                
+            }
+        }
     }
 
     // Update customer info
     private async Task UpdateCustomer()
     {
+        message = "it ran";
         try
         {
             if (customer is not null)
             {
                 await DataService.UpdateCustomerAsync(customer);
                 isUpdated = true;
+                message = "Customer function ran!";
 
                 StateHasChanged(); // Force UI refresh
 
                 // Wait 2 seconds and return to the customer list
-                await Task.Delay(2000);
-                NavigationManager.NavigateTo("/dashboard/customers");
+                //await Task.Delay(2000);
+                //NavigationManager.NavigateTo("/dashboard/customers");
             }
         }
         catch (Exception ex)

@@ -1,6 +1,6 @@
 @* @page "/dashboard/customer/items" *@
 @*Just for testing*@
-@page "/dashboard/customer/items/{id:int}"
+@page "/dashboard/customers/items"
 @using Warehouse.Components.Layout
 @layout DashboardLayout
 @using Warehouse.Data;
@@ -8,6 +8,7 @@
 @inject DataService DataService
 @inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 @rendermode InteractiveServer
 
 
@@ -54,14 +55,27 @@ else
 
 @code {
 
-    [Parameter]
-    public int Id { get; set; }
+    private Customer? customer;
+    private string? email;
     private List<InventoryItem> inventory = new();
 
 
+    // Load customer data when the component initializes
     protected override async Task OnInitializedAsync()
     {
-        inventory = await DataService.GetInventoryByCustomerIdAsync(Id);
+        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        
+        email = user.Identity?.Name;
+
+        if (!string.IsNullOrEmpty(email))
+        {
+            customer = await DataService.GetCustomerByEmailAsync(email);
+            if (customer != null)
+            {
+                inventory = await DataService.GetInventoryByCustomerIdAsync(customer.Id);
+            }
+        }
     }
 
 }

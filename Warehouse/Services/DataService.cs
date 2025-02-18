@@ -46,6 +46,12 @@ public class DataService
         return await _context.Workers.FindAsync(id);
     }
 
+    // get a worker by his/her email.
+    public async Task<Worker?> GetWorkerByEmailAsync(string email)
+    {
+        return await _context.Workers.FirstOrDefaultAsync(w => w.Email == email);
+    }
+
     // Adds a new worker
     public async Task AddWorkerAsync(Worker worker)
     {
@@ -135,6 +141,12 @@ public class DataService
         return await _context.Customers.FindAsync(id);
     }
 
+    // get a worker by his/her email.
+    public async Task<Customer?> GetCustomerByEmailAsync(string email)
+    {
+        return await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+    }
+
     //Gets all customers
     public async Task<List<Customer>> GetCustomersAsync() => await _context.Customers.ToListAsync();
 
@@ -149,8 +161,12 @@ public class DataService
     //Updates a customer's info
     public async Task UpdateCustomerAsync(Customer customer)
     {
-        _context.Customers.Update(customer);
-        await _context.SaveChangesAsync();
+        var existingCustomer = await _context.Customers.FindAsync(customer.Id);
+        if (existingCustomer != null)
+        {
+            _context.Entry(existingCustomer).CurrentValues.SetValues(customer);
+            await _context.SaveChangesAsync();
+        }
     }
 
     //Removes a customer from the db

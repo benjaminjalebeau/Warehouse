@@ -1,6 +1,43 @@
 @page "/test"
 @attribute [Authorize(Roles = "Worker")]
 @using Microsoft.AspNetCore.Authorization
+@using Warehouse.Models
+@inject AuthenticationStateProvider AuthStateProvider
+@inject DataService DataService
+
 
 <p>User Authorized</p>
+<p>Name: @name</p>
+<p>Id: @id</p>
+<p>Message: @message</p>
 
+@code
+{
+    private Worker? worker;
+    private string? name;
+    private int? id;
+
+    private string? email;
+
+    private string? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        
+        email = user.Identity?.Name;
+
+        if (!string.IsNullOrEmpty(email))
+        {
+            worker = await DataService.GetWorkerByEmailAsync(email);
+            if (worker != null)
+            {
+                name = worker.Name;
+                id = worker.Id;
+                message = "This ran";
+            }
+        }
+        
+    }
+}
