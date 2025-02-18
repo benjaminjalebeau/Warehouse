@@ -1,12 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Warehouse.Data;
 using Warehouse.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Components;
 
 
 
@@ -15,8 +13,8 @@ public class AuthService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly WarehouseDbContext _context;
 
+
     //The key will need to be stored in an enviroment variable later for security.
-    private readonly string _jwtSecret = "WnsfTEfOwUB1Hjn3y5YN+5+Bv1IVi+2z2zSL+5b++8s=";
 
     public AuthService(IHttpContextAccessor httpContextAccessor, WarehouseDbContext context)
     {
@@ -57,24 +55,15 @@ public class AuthService
         var httpContext = _httpContextAccessor.HttpContext!;
         await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
     }
-
-    private string GenerateJwtToken(string email, string role)
+     
+    
+    public async Task LogoutUser()
     {
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_jwtSecret);
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[] {
-                new Claim(ClaimTypes.Email, email),
-                new Claim("role", role)
-            }),
-            Expires = DateTime.UtcNow.AddHours(2),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        var httpContext = _httpContextAccessor.HttpContext!;
+        await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        
     }
+
 
     //Checks the user's input against a hashed password stored in the db. 
     //Note, Hashing has not yet been implemented, so this funciton checks passwords in plaintext.
