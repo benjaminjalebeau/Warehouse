@@ -1,20 +1,18 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+School project lasting about 4 weeks. Warehouse application allowing customer or worker accounts to view and manage inventory. 
+Customers can view all items belonging to them, stored in the warehouse. Workers can log, edit, view all inventory and manage customers.
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+# Production Link
+https://t7warehousemanager.azurewebsites.net/
+## Login with:
+- Customer account email: good@test.com password: password
+- Worker Account email: worker@worker.com password: password
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+# Tech
+- Asp.net core + blazor
+- SQLite
+- C#, HTML, CSS
 
-# Team Members
-- Fernando Gonzalez
-- Benjamin LeBeau
-- Jose Sanchez
-- Daniel Ramirez
-- Rafael Machado
-- Prince Chukwu
+# Contributors
+- Fernando Gonzalez - Frontend focused
+- Benjamin LeBeau - Backend focused
